@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>타자왕 챌린지</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #2a1a08;
+  font-family: 'Noto Sans KR', sans-serif;
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+}
+
+/* ── 전체 ── */
+.wrap {
+  width: 100%; max-width: 1160px;
+  display: grid;
+  grid-template-columns: 290px 1fr;
+  gap: 12px;
+  background: #2a1a08;
+  border-radius: 14px;
+  padding: 12px;
+}
+
+/* ══════════════════════
+   LEFT
+══════════════════════ */
+.left { display: flex; flex-direction: column; gap: 10px; }
+
+/* 프로필 카드 */
+.profile-card {
+  background: #c8a84a;
+  border-radius: 10px; padding: 12px 14px;
+  border: 2px solid #a88030;
+  display: flex; align-items: center; gap: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.35);
+}
+.avatar-box {
+  width: 60px; height: 60px; flex-shrink: 0;
+  border-radius: 8px; background: #7a4e10;
+  border: 2px solid #a88030;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; overflow: hidden;
+}
+.p-dept { font-size: 10px; color: #5a3a08; font-weight: 700; line-height: 1.5; }
+.p-name { font-size: 18px; font-weight: 900; color: #2a1a08; }
+
+/* 내 기록 카드 */
+.record-card {
+  background: #c8a84a;
+  border-radius: 10px; padding: 14px 16px;
+  border: 2px solid #a88030;
+  box-shadow: 0 2px 8px rgba(0,0,0,.35);
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+/* 내 기록 헤더 */
+.rec-header {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.rec-title {
+  font-size: 14px; font-weight: 700; color: #5a3a08;
+  display: flex; align-items: center; gap: 4px;
+}
+.rec-prev {
+  display: flex; align-items: center; gap: 5px;
+}
+.new-badge {
+  background: #e8453c; color: #fff;
+  font-size: 10px; font-weight: 900;
+  padding: 2px 6px; border-radius: 4px;
+  display: none;
+}
+.prev-label { font-size: 12px; font-weight: 700; color: #5a3a08; }
+.prev-val   { font-size: 12px; font-weight: 900; color: #2a1a08; }
+
+/* 실시간 타수 큰 숫자 */
+.wpm-big {
+  font-size: 52px; font-weight: 900; color: #2a1a08;
+  line-height: 1; text-align: right;
+}
+
+/* 바 영역 */
+.bars { display: flex; flex-direction: column; gap: 8px; }
+.bar-row { display: flex; flex-direction: column; gap: 3px; }
+.bar-head {
+  display: flex; justify-content: space-between;
+  font-size: 12px; font-weight: 700; color: #5a3a08;
+}
+.bar-num { font-weight: 900; color: #2a1a08; }
+.bar-track { height: 12px; background: rgba(90,58,8,.22); border-radius: 99px; overflow: hidden; }
+.bar-fill  { height: 100%; border-radius: 99px; transition: width .25s ease; }
+.bar-fill.blue  { background: linear-gradient(90deg,#2255cc,#1133aa); }
+.bar-fill.green { background: linear-gradient(90deg,#33bb44,#229933); }
+
+/* 진행시간 */
+.timer-row {
+  font-size: 13px; font-weight: 700; color: #3a2208;
+}
+.timer-val { font-weight: 900; }
+
+/* 순위 카드 */
+.rank-card {
+  background: #c8a84a;
+  border-radius: 10px; padding: 14px 16px;
+  border: 2px solid #a88030;
+  box-shadow: 0 2px 8px rgba(0,0,0,.35);
+  flex: 1;
+}
+.rank-title {
+  font-size: 15px; font-weight: 900; color: #2a1a08;
+  display: flex; align-items: center; gap: 5px; margin-bottom: 10px;
+}
+.rank-row {
+  padding: 6px 0; border-bottom: 1px dashed rgba(90,58,8,.3);
+  font-size: 13px; color: #3a2208; font-weight: 700;
+  line-height: 1.5;
+}
+.rank-row:last-child { border-bottom: none; }
+.ri-num   { color: #7a4e10; font-weight: 900; }
+.ri-score { font-weight: 900; color: #2a1a08; }
+.ri-room  { font-size: 11px; color: #7a5a28; display: block; padding-left: 2px; }
+
+/* ══════════════════════
+   RIGHT
+══════════════════════ */
+.right { display: flex; flex-direction: column; gap: 10px; }
+
+.game-header {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.game-title { font-size: 22px; font-weight: 900; color: #f0d880; }
+.attempts {
+  background: #c8a84a; border-radius: 8px;
+  padding: 7px 14px; font-size: 14px; font-weight: 900; color: #2a1a08;
+  display: flex; align-items: center; gap: 6px;
+  border: 2px solid #a88030;
+}
+.bolt { font-size: 16px; }
+
+/* ── 문장 패널 ── */
+.sent-panel {
+  background: #c8a84a;
+  border-radius: 10px; border: 2px solid #a88030;
+  box-shadow: 0 2px 12px rgba(0,0,0,.35);
+  flex: 1;
+  padding: 8px 10px;
+  display: flex; flex-direction: column; gap: 2px;
+  overflow-y: auto;
+}
+.sent-panel::-webkit-scrollbar { width: 4px; }
+.sent-panel::-webkit-scrollbar-track { background: transparent; }
+.sent-panel::-webkit-scrollbar-thumb { background: rgba(90,58,8,.3); border-radius: 99px; }
+
+/* 문장 블록 */
+.s-block {
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* 지문 표시줄 */
+.s-display {
+  padding: 10px 16px;
+  font-size: 14px; font-weight: 500;
+  line-height: 1.5;
+  color: rgba(42,26,8,.45);
+  border-bottom: 1px solid rgba(90,58,8,.18);
+}
+.s-block:last-child .s-display { border-bottom: none; }
+
+/* 완료 상태 */
+.s-block.done .s-display {
+  color: rgba(42,26,8,.38);
+  background: transparent;
+}
+
+/* 활성 상태 */
+.s-block.active .s-display {
+  background: #7a4e10;
+  color: #f0d880;
+  font-size: 15px; font-weight: 700;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+}
+
+/* 대기 상태 */
+.s-block.waiting .s-display {
+  background: rgba(90,58,8,.15);
+  color: rgba(42,26,8,.6);
+}
+/* 첫번째 waiting은 좀 더 보임 */
+.s-block.waiting:first-of-type .s-display,
+.s-block.waiting .s-display { color: rgba(42,26,8,.6); }
+
+/* char 색상 */
+.ch     { display: inline; }
+.ch.ok  { color: #5dcc5d; }
+.ch.err { color: #ff5040; }
+.ch.dim { color: rgba(240,216,128,.38); }
+.ch.cur {
+  border-left: 2.5px solid #f0d880;
+  animation: blink .7s infinite;
+  margin-left: 1px;
+}
+@keyframes blink {
+  0%,100% { border-color: #f0d880; }
+  50%     { border-color: transparent; }
+}
+
+/* 입력 행 */
+.s-input-row {
+  display: none;
+  align-items: center; gap: 10px;
+  padding: 8px 16px 10px;
+  background: #7a4e10;
+  border-top: 1px solid rgba(240,216,128,.15);
+  border-radius: 0 0 8px 8px;
+}
+.s-block.active .s-input-row { display: flex; }
+
+.pencil-icon { font-size: 14px; color: rgba(240,216,128,.65); flex-shrink: 0; }
+.typer {
+  flex: 1; background: transparent;
+  border: none; outline: none;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px; font-weight: 600;
+  color: #f0d880; caret-color: #f0d880;
+}
+.typer::placeholder { color: rgba(240,216,128,.25); font-weight: 400; }
+.enter-hint {
+  font-size: 11px; color: rgba(240,216,128,.35);
+  white-space: nowrap; font-weight: 700;
+}
+
+/* ══ OVERLAYS ══ */
+.ov {
+  position: fixed; inset: 0;
+  background: rgba(15,8,0,.88);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 300;
+}
+.ov.hidden { display: none; }
+.modal {
+  background: #c8a84a;
+  border-radius: 16px; border: 3px solid #a88030;
+  padding: 44px 56px; text-align: center;
+  box-shadow: 0 24px 64px rgba(0,0,0,.55);
+  animation: pop .38s cubic-bezier(.175,.885,.32,1.275);
+}
+@keyframes pop {
+  from { transform: scale(.76); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+.mod-title { font-size: 30px; font-weight: 900; color: #2a1a08; margin-bottom: 8px; }
+.mod-sub   { font-size: 14px; color: #5a3a08; font-weight: 700; margin-bottom: 26px; line-height: 1.7; }
+.mod-grid  { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; margin-bottom: 28px; }
+.mod-n { font-size: 34px; font-weight: 900; color: #3a2208; }
+.mod-l { font-size: 12px; color: #7a5a28; font-weight: 700; }
+.mod-btn {
+  background: #5a3a08; color: #f0d880;
+  border: none; border-radius: 10px;
+  padding: 13px 38px; font-size: 16px; font-weight: 900;
+  font-family: 'Noto Sans KR', sans-serif;
+  cursor: pointer; transition: all .2s;
+}
+.mod-btn:hover { background: #3a2208; transform: translateY(-2px); }
+
+@keyframes shake {
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-5px)}40%{transform:translateX(5px)}
+  60%{transform:translateX(-3px)}80%{transform:translateX(3px)}
+}
+.shake { animation: shake .3s ease; }
+</style>
+</head>
+<body>
+
+<!-- 시작 -->
+<div class="ov" id="ovStart">
+  <div class="modal">
+    <div class="mod-title">⌨️ 타자왕 챌린지</div>
+    <div class="mod-sub">
+      문장을 정확하게 입력하고 <strong>Enter</strong>를 누르세요.<br>
+      현재 문장이 강조되고 완료하면 다음으로 이동합니다.
+    </div>
+    <button class="mod-btn" onclick="startGame()">시작하기 ▶</button>
+  </div>
+</div>
+
+<!-- 결과 -->
+<div class="ov hidden" id="ovResult">
+  <div class="modal">
+    <div class="mod-title">🏆 챌린지 완료!</div>
+    <div class="mod-sub" id="resSub">모든 문장을 완성했습니다!</div>
+    <div class="mod-grid">
+      <div><div class="mod-n" id="resWpm">0</div><div class="mod-l">최종 타수</div></div>
+      <div><div class="mod-n" id="resAcc">0%</div><div class="mod-l">정확도</div></div>
+      <div><div class="mod-n" id="resTime">0초</div><div class="mod-l">소요시간</div></div>
+    </div>
+    <button class="mod-btn" onclick="restartGame()">다시 도전하기 🔄</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="wrap">
+
+  <!-- ── LEFT ── -->
+  <div class="left">
+
+    <!-- 프로필 -->
+    <div class="profile-card">
+      <div class="avatar-box">👤</div>
+      <div>
+        <div class="p-dept">전략기획사업부 워크이노베이션센터</div>
+        <div class="p-name">강민우 매니저</div>
+      </div>
+    </div>
+
+    <!-- 내 기록 -->
+    <div class="record-card">
+      <!-- 헤더: 내 기록 | NEW 최고타수 803타 -->
+      <div class="rec-header">
+        <div class="rec-title">🏆 내 기록</div>
+        <div class="rec-prev">
+          <span class="new-badge" id="newBadge">NEW</span>
+          <span class="prev-label">최고타수</span>
+          <span class="prev-val" id="prevBest">0타</span>
+        </div>
+      </div>
+
+      <!-- 실시간 타수 큰 숫자 -->
+      <div class="wpm-big" id="wpmBig">0</div>
+
+      <!-- 바 -->
+      <div class="bars">
+        <div class="bar-row">
+          <div class="bar-head">
+            <span>타수(유효타/분)</span>
+            <span class="bar-num" id="wpmVal">0</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill blue" id="wpmBar" style="width:0%"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-head">
+            <span>정확도(%)</span>
+            <span class="bar-num" id="accVal">0</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill green" id="accBar" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <!-- 진행시간 -->
+      <div class="timer-row">
+        진행시간 : <span class="timer-val" id="timerTxt">00: 00</span>
+      </div>
+    </div>
+
+    <!-- 순위 -->
+    <div class="rank-card">
+      <div class="rank-title">👑 실시간 전체 순위</div>
+      <div class="rank-row"><span class="ri-num">1위. </span>홍길동 책임매니저 <span class="ri-score">826타</span><span class="ri-room">(0000실)</span></div>
+      <div class="rank-row"><span class="ri-num">2위. </span>박길동 책임매니저 <span class="ri-score">822타</span><span class="ri-room">(0000실)</span></div>
+      <div class="rank-row"><span class="ri-num">3위. </span>고길동 책임매니저 <span class="ri-score">821타</span><span class="ri-room">(0000실)</span></div>
+      <div class="rank-row"><span class="ri-num">4위. </span>김길동 책임매니저 <span class="ri-score">816타</span><span class="ri-room">(0000실)</span></div>
+      <div class="rank-row"><span class="ri-num">5위. </span>서길동 책임매니저 <span class="ri-score">804타</span><span class="ri-room">(0000실)</span></div>
+    </div>
+
+  </div>
+
+  <!-- ── RIGHT ── -->
+  <div class="right">
+
+    <div class="game-header">
+      <div class="game-title">타자왕 챌린지</div>
+      <div class="attempts"><span class="bolt">⚡</span> 남은 도전 횟수 <span id="attLeft">4/5</span></div>
+    </div>
+
+    <!-- 문장 패널 -->
+    <div class="sent-panel" id="sentPanel"></div>
+
+  </div>
+</div>
+
+<script>
+/* ═══ 데이터 ═══ */
+const SENTENCES = [
+  "2026년 우리는 모두 한마음으로 합심하여 아래 세 가지를 이루어 냅시다",
+  "글로벌 에너지 리더로 도약",
+  "AI 확산으로 전력수요가 폭발적으로 증가하는 전 세계적인 에너지 슈퍼사이클에 맞추어",
+  "우리는 에너지 생산,이동,소비 전 밸류체인을 아우르는 에너지 기업으로 변모하고 있습니다",
+  "생산 분야에서는 미국,유럽을 중심으로 대형원전,smr태양광 사업을 본격화하고",
+  "이동분야에서는 차세대 초고압 송전 사업의 선전시장 진출을 확대하는 한편",
+  "수전해,암모니아 등 수소사업을 선제적으로 준비해야 합니다",
+  "소비 분야에서는 에너지 최대 수요처인 데이터센터의 글로벌 시장 성공경험을 축적해야 합니다"
+];
+
+/* ═══ 상태 ═══ */
+let cur = 0;
+let startTime = null, clockInt = null;
+let totalTyped = 0, totalCorrect = 0;
+let isActive = false, elapsed = 0;
+
+// 최고타수: 게임 시작 전 이전 기록 (고정값, 실시간 변경 안 함)
+const PREV_BEST = 810; // 이전 최고기록 (고정)
+document.getElementById('prevBest').textContent = PREV_BEST + '타';
+
+/* ═══ DOM ═══ */
+const sentPanel = document.getElementById('sentPanel');
+const timerTxt  = document.getElementById('timerTxt');
+const wpmBig    = document.getElementById('wpmBig');
+const wpmVal    = document.getElementById('wpmVal');
+const wpmBar    = document.getElementById('wpmBar');
+const accVal    = document.getElementById('accVal');
+const accBar    = document.getElementById('accBar');
+const newBadge  = document.getElementById('newBadge');
+
+/* ═══ 시작 / 재시작 ═══ */
+function startGame() {
+  document.getElementById('ovStart').classList.add('hidden');
+  isActive = true;
+  cur = totalTyped = totalCorrect = elapsed = 0;
+  buildAll();
+  focusCur();
+  startTime = Date.now();
+  clockInt  = setInterval(tick, 1000);
+}
+
+function restartGame() {
+  document.getElementById('ovResult').classList.add('hidden');
+  clearInterval(clockInt);
+  timerTxt.textContent = '00: 00';
+  wpmBig.textContent = wpmVal.textContent = accVal.textContent = '0';
+  wpmBar.style.width = accBar.style.width = '0%';
+  startGame();
+}
+
+/* ═══ 전체 빌드 ═══ */
+function buildAll() {
+  sentPanel.innerHTML = '';
+  SENTENCES.forEach((s, i) => {
+    const block = document.createElement('div');
+    block.className = 's-block ' + (i === 0 ? 'active' : 'waiting');
+    block.id = `b${i}`;
+
+    // 지문
+    const disp = document.createElement('div');
+    disp.className = 's-display';
+    disp.id = `d${i}`;
+    disp.textContent = s;
+
+    // 입력행
+    const ir = document.createElement('div');
+    ir.className = 's-input-row';
+    ir.innerHTML = `
+      <span class="pencil-icon">✏️</span>
+      <input class="typer" id="t${i}" type="text"
+        autocomplete="off" spellcheck="false"
+        placeholder="여기에 타이핑하세요..." />
+      <span class="enter-hint">Enter →다음</span>
+    `;
+
+    block.appendChild(disp);
+    block.appendChild(ir);
+    sentPanel.appendChild(block);
+
+    attachEv(i);
+  });
+}
+
+/* ═══ 이벤트 ═══ */
+function attachEv(i) {
+  const t = document.getElementById(`t${i}`);
+  if (!t) return;
+  t.addEventListener('input', () => {
+    if (!isActive) return;
+    renderChars(i, t.value);
+    calcStats(t.value);
+  });
+  t.addEventListener('keydown', e => {
+    if (!isActive || e.key !== 'Enter') return;
+    e.preventDefault();
+    submit(i, t.value);
+  });
+}
+
+/* ═══ 글자 하이라이트 ═══ */
+function renderChars(i, typed) {
+  const d = document.getElementById(`d${i}`);
+  if (!d) return;
+  const s = SENTENCES[i];
+  let h = '';
+  for (let j = 0; j < s.length; j++) {
+    let c = 'ch';
+    if      (j < typed.length)     c += typed[j] === s[j] ? ' ok' : ' err';
+    else if (j === typed.length)   c += ' cur dim';
+    else                            c += ' dim';
+    h += `<span class="${c}">${s[j] === ' ' ? '&nbsp;' : s[j]}</span>`;
+  }
+  if (typed.length >= s.length) h += `<span class="ch cur"></span>`;
+  d.innerHTML = h;
+}
+
+/* ═══ 제출 ═══ */
+function submit(i, val) {
+  const tgt = SENTENCES[i];
+  if (!val.trim()) {
+    const ir = document.querySelector(`#b${i} .s-input-row`);
+    ir.classList.add('shake');
+    setTimeout(() => ir.classList.remove('shake'), 320);
+    return;
+  }
+
+  // 통계 집계
+  const len = Math.min(val.length, tgt.length);
+  let ok = 0;
+  for (let j = 0; j < len; j++) if (val[j] === tgt[j]) ok++;
+  totalCorrect += ok;
+  totalTyped   += val.length;
+
+  // 현재 블록 → done, 원문 복원
+  const block = document.getElementById(`b${i}`);
+  block.classList.replace('active', 'done');
+  document.getElementById(`d${i}`).textContent = tgt;
+
+  cur = i + 1;
+  if (cur >= SENTENCES.length) { setTimeout(endGame, 200); return; }
+
+  // 다음 블록 → active
+  const nb = document.getElementById(`b${cur}`);
+  nb.classList.replace('waiting', 'active');
+  nb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  focusCur();
+  calcStats('');
+}
+
+function focusCur() {
+  const t = document.getElementById(`t${cur}`);
+  if (t) setTimeout(() => t.focus(), 40);
+}
+
+/* ═══ 통계 (실시간) ═══ */
+function calcStats(curVal) {
+  if (!startTime) return;
+  const elMin = (Date.now() - startTime) / 60000;
+  if (elMin <= 0) return;
+
+  const tt  = totalTyped + curVal.length;
+  const wpm = Math.round(tt / elMin);
+
+  let okNow = 0;
+  const tgt = SENTENCES[cur] || '';
+  for (let i = 0; i < Math.min(curVal.length, tgt.length); i++)
+    if (curVal[i] === tgt[i]) okNow++;
+
+  const acc = tt > 0 ? Math.round(((totalCorrect + okNow) / tt) * 100) : 0;
+
+  // 실시간 갱신
+  wpmBig.textContent = wpm;
+  wpmVal.textContent = wpm;
+  wpmBar.style.width = Math.min(wpm / 6, 100) + '%';
+  accVal.textContent = acc;
+  accBar.style.width = acc + '%';
+
+  // 최고타수 NEW 뱃지: 현재 세션 타수가 이전 기록 넘으면
+  if (wpm > PREV_BEST) {
+    newBadge.style.display = 'inline';
+  }
+}
+
+/* ═══ 타이머 ═══ */
+function tick() {
+  elapsed++;
+  const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
+  const ss = String(elapsed % 60).padStart(2, '0');
+  timerTxt.textContent = `${mm}: ${ss}`;
+}
+
+/* ═══ 종료 ═══ */
+function endGame() {
+  isActive = false;
+  clearInterval(clockInt);
+  const elMin = (Date.now() - startTime) / 60000;
+  const wpm   = elMin > 0 ? Math.round(totalTyped / elMin) : 0;
+  const acc   = totalTyped > 0 ? Math.round((totalCorrect / totalTyped) * 100) : 0;
+
+  document.getElementById('resWpm').textContent  = wpm + '타';
+  document.getElementById('resAcc').textContent  = acc + '%';
+  document.getElementById('resTime').textContent = elapsed + '초';
+  document.getElementById('resSub').textContent  =
+    `모든 ${SENTENCES.length}개 문장을 완성했습니다! 🎉`;
+  document.getElementById('attLeft').textContent = '3/5';
+  document.getElementById('ovResult').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
